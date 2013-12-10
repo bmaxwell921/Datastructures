@@ -3,6 +3,7 @@ package com.brandon.datastructures.impl;
 import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import com.brandon.datastructures.UpdateablePriorityQueue;
 
@@ -73,9 +74,16 @@ public class LocationMapPQ<E, V extends Comparable<? super V>> implements
 		
 		// Fix heap ordering
 		percolateUp(size);
+		
+		/*
+		 *  Location map will know where element ends up because swap handles that.
+		 *  (Called in percolateUp)
+		 */
+		
 		++size;
 	}
 	
+	// Returns the ending location of the element starting at heap[index]
 	private void percolateUp(int index) {
 		// STOP! Top of the heap
 		if (index == QUEUE_TOP) return;
@@ -91,7 +99,57 @@ public class LocationMapPQ<E, V extends Comparable<? super V>> implements
 		swap(parent, index);
 		
 		// Continue percolating up
-		percolateUp(parent);
+		return;
+	}
+	
+	@Override
+	public PQEntry<E, V> dequeue() {
+		if (isEmpty()) {
+			throw new NoSuchElementException("Queue is empty");
+		}
+		
+		PQEntry<E, V> ret = heap[QUEUE_TOP];
+		
+		// Move the last element to the top, breaking heap ordering
+		swap(QUEUE_TOP, size - 1);
+		
+		// "Delete the element"
+		heap[size - 1] = null;
+		
+		// Decrement the size first so percolate doesn't go off the end of the heap
+		--size;
+		
+		// Fix heap ordering
+		percolateDown(QUEUE_TOP);
+		
+		return ret;
+	}
+	
+	private void percolateDown(int index) {
+		// No more children, done
+		if (firstChild(index) >= size) {
+			return;
+		}
+		
+		// At least one child so assume first is smaller 
+		int smallChild = firstChild(index);
+		int secondChild = secondChild(index);
+		
+		// Update the smallChild if the secondChild is actually smaller than the first
+		if (secondChild < size && 
+				lessThan(heap[secondChild].getValue(), heap[smallChild].getValue())) {
+			smallChild = secondChild;
+		}
+		
+		//If the current element is smaller than its smallest child it can stay 
+		if (greaterThan(heap[smallChild].getValue(), heap[index].getValue())) {
+			return;
+		}
+		
+		// Otherwise it needs to move down
+		swap(index, smallChild);
+		
+		percolateDown(smallChild);
 	}
 
 	/*
@@ -182,12 +240,6 @@ public class LocationMapPQ<E, V extends Comparable<? super V>> implements
 		public void setValue(V value) {
 			this.value = value;
 		}
-	}
-
-	@Override
-	public PQEntry<E, V> dequeue() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@Override
