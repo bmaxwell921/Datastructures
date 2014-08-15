@@ -63,7 +63,7 @@ public interface IGraph<V> {
 	 * @param start
 	 * @param list
 	 */
-	public void traverseDepth(V start, TraverseListener<V> list);
+	public void traverseDepth(TraverseListener<V> listen);
 	
 	/**
 	 * Traverses the graph from the start node, informing the 
@@ -72,7 +72,7 @@ public interface IGraph<V> {
 	 * @param start
 	 * @param list
 	 */
-	public void traverseBreadth(V start, TraverseListener<V> list);
+	public void traverseBreadth(TraverseListener<V> listen);
 	
 	public interface TraverseListener<V> {
 		public void visit(V node);
