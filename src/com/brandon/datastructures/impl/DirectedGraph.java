@@ -92,15 +92,45 @@ public class DirectedGraph<V> implements IGraph<V> {
 	}
 
 	@Override
-	public void traverseDepth(V start, TraverseListener<V> list) {
-		// TODO Auto-generated method stub
-
+	public void traverseDepth(TraverseListener<V> listen) {
+		Set<V> visited = new HashSet<>();
+		
+		for (V node : nodeList.keySet()) {
+			dfs(node, visited, listen);
+		}
+	}
+	
+	private void dfs(V node, Set<V> visited, TraverseListener<V> listen) {
+		if (visited.contains(node)) {
+			return;
+		}
+		visited.add(node);
+		listen.visit(node);
+		
+		for (V neighbor : nodeList.get(node)) {
+			dfs(neighbor, visited, listen);
+		}
 	}
 
 	@Override
-	public void traverseBreadth(V start, TraverseListener<V> list) {
-		// TODO Auto-generated method stub
-
+	public void traverseBreadth(TraverseListener<V> listen) {
+		Set<V> visited = new HashSet<>();
+		
+		for (V node : nodeList.keySet()) {
+			bfs(node, visited, listen);
+		}
+	}
+	
+	private void bfs(V node, Set<V> visited, TraverseListener<V> listen) {
+		if (visited.contains(node)) {
+			return;
+		}
+		visited.add(node);
+		listen.visit(node);
+		
+		for (V neighbor : nodeList.get(node)) {
+			bfs(neighbor, visited, listen);
+		}
 	}
 
 }
